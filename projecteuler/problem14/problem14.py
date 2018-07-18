@@ -11,15 +11,24 @@ def collatz_seq(num):
         seq.append(collatz_next(seq[-1]))
     return seq
 
+def collatz_seq_len(num):
+    len=1
+    while num != 1:
+        num = collatz_next(num)
+        len += 1
+    return len
 
 print('example: Collatz sequence for number 51:')
 print(collatz_seq(51))
 
-maxnum=100000
+print('example: Collatz sequence length for number 51:')
+print(collatz_seq_len(51))
+
+maxnum=1000000
 longest_len=0
 longest_num=0
 for i in range(1,maxnum):
-    seqlen=len(collatz_seq(i))
+    seqlen=collatz_seq_len(i)
     if seqlen > longest_len:
         #print(seqlen)
         longest_len=seqlen
