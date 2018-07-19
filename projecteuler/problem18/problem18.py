@@ -50,6 +50,7 @@ bigtriangle=[
 ]
 
 
+#triangle = smalltriangle
 triangle = bigtriangle
 
 # check triangle format is correct
@@ -67,7 +68,7 @@ for rowidx in range(nr_rows):
 #
 print('triangle with ', nr_rows, ' rows.')
 
-def print_route(triangle, routecode):
+def make_route(triangle, routecode):
     nr_bits = len(triangle) - 1
     leftrights = route_code2list(routecode,nr_bits)
     routedescr = ['dummy']
@@ -84,7 +85,10 @@ def print_route(triangle, routecode):
             raise Error()
         route.append(triangle[rowidx][columnidx])
         previous_column = columnidx
-    print(route)
+    return route
+
+def print_route(triangle, routecode):
+    print(make_route(triangle, routecode))
 
 def route_code2list(code, nrbits):
     # code = number between 0 and 2^^bits-1
@@ -106,5 +110,22 @@ routecode=random.randint(0,2**nr_bits-1)
 print('route coding: ', routecode)
 print('route list: ', route_code2list(routecode, nr_bits))
 print_route(triangle,routecode)
+
+# now the actual problem:
+maxsum=0
+maxroute=None
+maxcode=None
+for routecode in range(2**nr_bits):
+    route = make_route(triangle,routecode)
+    if sum(route) > maxsum:
+        maxsum = sum(route)
+        maxroute = route
+        maxcode = routecode
+
+print('Results:')
+print('Code: ', maxcode)
+print('Route: ', maxroute)
+print('Sum: ', maxsum)
+
 
 
