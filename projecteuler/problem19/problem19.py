@@ -34,15 +34,15 @@ def main():
     print('One week after', d2, ':', d2+oneweek)
     d2=datetime.date(1950, 2, 27)
     print('One week after', d2, ':', d2+oneweek)
+    print('Start date:', start_day)
+    print('End date:', end_day)
     nr_sundays=0
     for year in range(start_day.year,end_day.year+1):
         for month in range(1,13):
             d = datetime.date(year,month,1)
             if is_sunday(d):
-                print(d)
                 nr_sundays += 1
-    print('Number of sundays:', nr_sundays)
-
+    print('Number of sundays on yyyy-mm-1 days between start and end date:', nr_sundays)
 
 
 main()
