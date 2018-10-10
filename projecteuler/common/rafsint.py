@@ -54,3 +54,11 @@ class RafsInt:
 
     def get_proper_positive_divisors(self):
         return [1,2]
+
+    def is_deficient(self):
+        return True
+
+    def is_abundant(self):
+        return False
+
+

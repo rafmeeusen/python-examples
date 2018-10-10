@@ -35,6 +35,7 @@ class TestRafsInt (unittest.TestCase):
         self.assertFalse(RafsInt(4).is_perfect())
         self.assertFalse(RafsInt(5).is_perfect())
         self.assertTrue(RafsInt(6).is_perfect())
+        self.assertTrue(RafsInt(28).is_perfect())
 
     def test_get_prime_factorization(self):
         self.assertEqual(RafsInt(2).get_prime_factorization_dict(), {2:1})
@@ -76,8 +77,14 @@ class TestRafsInt (unittest.TestCase):
         self.assertTrue(RafsInt(55).is_triangular())
         self.assertTrue(RafsInt(66).is_triangular())
 
+    def test_is_deficient(self):
+        self.assertTrue(RafsInt(1).is_deficient())
+        self.assertTrue(RafsInt(2).is_deficient())
+        self.assertTrue(RafsInt(3).is_deficient())
+
+    def test_is_abundant(self):
+        self.assertTrue(RafsInt(12).is_abundant())
 
 if __name__ == '__main__':
     unittest.main()
-
 
