@@ -12,8 +12,19 @@ class RafsInt:
         return pyprimes.is_prime(self.__num)
 
     def is_perfect(self):
+        if self.__num <= 0:
+            return False
         sum_divisors = sum( self.get_proper_positive_divisors() )
         return self.__num == sum_divisors
+
+    def is_deficient(self):
+        sum_divisors = sum( self.get_proper_positive_divisors() )
+        return sum_divisors < self.__num
+
+    def is_abundant(self):
+        sum_divisors = sum( self.get_proper_positive_divisors() )
+        return sum_divisors > self.__num
+
 
     def is_even(self):
         if self.__num % 2 == 0:
@@ -53,12 +64,8 @@ class RafsInt:
         return nrdividers
 
     def get_proper_positive_divisors(self):
-        return [1,2]
+        n = self.__num
+        return {x for x in range(1, (n + 1) // 2 + 1) if n % x == 0 and n != x}
 
-    def is_deficient(self):
-        return True
-
-    def is_abundant(self):
-        return False
 
 
