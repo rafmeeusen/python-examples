@@ -35,6 +35,7 @@ class TestRafsInt (unittest.TestCase):
         self.assertFalse(RafsInt(4).is_perfect())
         self.assertFalse(RafsInt(5).is_perfect())
         self.assertTrue(RafsInt(6).is_perfect())
+        self.assertFalse(RafsInt(7).is_perfect())
         self.assertTrue(RafsInt(28).is_perfect())
 
     def test_get_prime_factorization(self):
@@ -78,11 +79,27 @@ class TestRafsInt (unittest.TestCase):
         self.assertTrue(RafsInt(66).is_triangular())
 
     def test_is_deficient(self):
+        self.assertFalse(RafsInt(0).is_deficient())
         self.assertTrue(RafsInt(1).is_deficient())
         self.assertTrue(RafsInt(2).is_deficient())
         self.assertTrue(RafsInt(3).is_deficient())
+        self.assertTrue(RafsInt(4).is_deficient())
+        self.assertTrue(RafsInt(5).is_deficient())
+        self.assertFalse(RafsInt(6).is_deficient())
 
     def test_is_abundant(self):
+        self.assertFalse(RafsInt(0).is_abundant())
+        self.assertFalse(RafsInt(1).is_abundant())
+        self.assertFalse(RafsInt(2).is_abundant())
+        self.assertFalse(RafsInt(3).is_abundant())
+        self.assertFalse(RafsInt(4).is_abundant())
+        self.assertFalse(RafsInt(5).is_abundant())
+        self.assertFalse(RafsInt(6).is_abundant())
+        self.assertFalse(RafsInt(7).is_abundant())
+        self.assertFalse(RafsInt(8).is_abundant())
+        self.assertFalse(RafsInt(9).is_abundant())
+        self.assertFalse(RafsInt(10).is_abundant())
+        self.assertFalse(RafsInt(11).is_abundant())
         self.assertTrue(RafsInt(12).is_abundant())
 
 if __name__ == '__main__':
