@@ -1,15 +1,21 @@
 import argparse
-
+from pdfminer.pdfparser import PDFParser
+from pdfminer.pdfdocument import PDFDocument
+from pdfminer.pdfpage import PDFPage
 
 class PdfParser(object):
     ''' basic CLI tool to extra info from a pdf,
         based on PDFMiner
         https://github.com/pdfminer/pdfminer.six '''
-    def __init__(self, f):
-        print('todo init pdfminer')
-
+    def __init__(self, fp):
+        parser = PDFParser(fp)
+        self.doc = PDFDocument(parser)
     def nrofpages(self):
-        return 2
+        pages = PDFPage.create_pages(self.doc)
+        nrpages = 0
+        for p in pages:
+            nrpages += 1
+        return nrpages
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse pdf files')
