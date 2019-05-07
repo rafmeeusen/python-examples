@@ -16,16 +16,29 @@ class PdfParser(object):
         for p in pages:
             nrpages += 1
         return nrpages
+    def getdocinfo(self):
+        return self.doc.info[0]
+
+
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse pdf files')
     parser.add_argument('filename', help='Filename of pdf file')
-    parser.add_argument('-p', '--pages', action="store_true", help='Print number of pages')
+    parser.add_argument('-i', '--info', action="store_true", help='Print info about the pdf')
     args = parser.parse_args()
 
     openedpdffile = open(args.filename,'rb')
     mypdfparser = PdfParser(openedpdffile)
 
-    if args.pages:
-        print('Finding out nr of pages in pdf')
-        print('Nr of pages:', mypdfparser.nrofpages())
+    info = mypdfparser.getdocinfo()
+    nrpages = mypdfparser.nrofpages()
+
+    if args.info:
+        for key in info.keys():
+            print(key, ":", info[key])
+        print('Nr of pages:', nrpages)
+
+'''
+[{'Author': b'Registered to: SD WORX ', 'CreationDate': b'8/28/2018 21:54:47', 'Creator': b'HP Exstream Version 9.0.107 64-bit', 'Title': b'Loonbrief'}]
+'''
