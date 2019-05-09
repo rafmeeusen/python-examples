@@ -25,35 +25,45 @@ class PdfParser(object):
         rsrcmgr = PDFResourceManager()
         self.device = PDFPageAggregator(rsrcmgr, laparams=laparams)
         self.interpreter = PDFPageInterpreter(rsrcmgr, self.device)
-    def nrofpages(self):
         pages = PDFPage.create_pages(self.doc)
-        nrpages = 0
+        self.nrpages = 0
+        self.pagelayouts = []
         for p in pages:
-            nrpages += 1
-        return nrpages
+            self.interpreter.process_page(p)
+            layout = self.device.get_result()
+            self.pagelayouts.append(layout)
+            self.nrpages += 1
+        ''' pagenr starts at 1, index in islice at 0 '''
+        #page_x = next(islice(pages,pagenr-1,pagenr))
+    def nrofpages(self):
+        return self.nrpages
     def getdocinfo(self):
         return self.doc.info[0]
     def getpagelayout(self, pagenr):
-        pages = PDFPage.create_pages(self.doc)
-        ''' pagenr starts at 1, index in islice at 0 '''
-        page_x = next(islice(pages,pagenr-1,pagenr))
-        self.interpreter.process_page(page_x)
-        layout = self.device.get_result()
-        return layout
+        return self.pagelayouts[pagenr-1]
 
-''' search given string in all the child objects of given page
-WARNING: page is pagelayout object
-'''
-def findChildWithString(page, searchstring):
-    if not isinstance(page,LTPage):
-        raise Exception('error - function expects PDFPage')
-    for child_object in pl:
-        if isinstance(child_object, LTTextBoxHorizontal) or isinstance(child_object, LTTextLineHorizontal):
-            object_text = child_object.get_text()
+    ''' search all objects in pagelayout for given string '''
+    def __searchpage(self, pagelayout, searchstring):
+        objects=[]
+        for child_object in pagelayout:
+            if isinstance(child_object, LTTextBoxHorizontal) or isinstance(child_object, LTTextLineHorizontal):
+                object_text = child_object.get_text()
             if searchstring in object_text:
-                return child_object
-    return None
+                objects.append(child_object)
+        return objects
 
+    ''' return all text objects where search string is found '''
+    def search(self,searchstring,pagenr=None):
+        children=[]
+        pagenumbers=[]
+        if pagenr:
+            pagenumbers = [pagenr]
+        else:
+            pagenumbers = range(1,1+self.nrpages)
+        for pagenr in pagenumbers:
+            pageobjects=self.__searchpage(self.getpagelayout(pagenr), searchstring)
+            children.append(pageobjects)
+        return children
 
 
 if __name__ == '__main__':
@@ -88,11 +98,13 @@ if __name__ == '__main__':
         print('page',p)
         print('search string',searchstring)
         pl=mypdfparser.getpagelayout(p)
-        searchresult = findChildWithString(pl, searchstring)
-    ''' WARNING: multiple pages can have same string! '''
+        # searchresult = findChildWithString(pl, searchstring)
+        mypdfparser.search(searchstring)
+        searchresults=mypdfparser.search(searchstring,p)
+        for r in searchresults:
+            print('Found',searchstring,'in following object:')
+            print(r)
 
-    print('Found',searchstring,'in following object:')
-    print(searchresult)
 
     if False:
         ''' note: value 0 is ignored this way; pages start at 1 '''
