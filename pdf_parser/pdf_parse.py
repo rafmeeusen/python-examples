@@ -18,7 +18,9 @@ class PdfParser(object):
     ''' basic CLI tool to extra info from a pdf,
         based on PDFMiner
         https://github.com/pdfminer/pdfminer.six '''
-    def __init__(self, fp):
+
+    ''' instantiate for given page or default for all page layouts '''
+    def __init__(self, fp, pagenr=None):
         parser = PDFParser(fp)
         self.doc = PDFDocument(parser)
         laparams = LAParams()
@@ -28,22 +30,23 @@ class PdfParser(object):
         pages = PDFPage.create_pages(self.doc)
         self.nrpages = 0
         self.pagelayouts = []
+        # count all pages, but only store requested pagelayout (or all if None)
         for p in pages:
-            self.interpreter.process_page(p)
-            layout = self.device.get_result()
-            self.pagelayouts.append(layout)
             self.nrpages += 1
-        ''' pagenr starts at 1, index in islice at 0 '''
-        #page_x = next(islice(pages,pagenr-1,pagenr))
+            # pagenr starts at 1, index in islice at 0
+            if not pagenr or (pagenr and (pagenr==self.nrpages)):
+                self.interpreter.process_page(p)
+                layout = self.device.get_result()
+                self.pagelayouts.append(layout)
     def nrofpages(self):
         return self.nrpages
     def getdocinfo(self):
         return self.doc.info[0]
-    def getpagelayout(self, pagenr):
-        return self.pagelayouts[pagenr-1]
+#    def getpagelayout(self, pagenr):
+#        return self.pagelayouts[pagenr-1]
 
     ''' search all objects in pagelayout for given string '''
-    def __searchpage(self, pagelayout, searchstring):
+    def __searchpagestr(self, pagelayout, searchstring):
         objects=[]
         for child_object in pagelayout:
             if isinstance(child_object, LTTextBoxHorizontal) or isinstance(child_object, LTTextLineHorizontal):
@@ -51,20 +54,40 @@ class PdfParser(object):
             if searchstring in object_text:
                 objects.append(child_object)
         return objects
+    def __searchpagey(self, pagelayout, yval, maxerr):
+        miny = yval-maxerr
+        maxy = yval+maxerr
+        objects=[]
+        for child_object in pagelayout:
+            if isinstance(child_object, LTTextBoxHorizontal) or isinstance(child_object, LTTextLineHorizontal):
+                object_y0 = child_object.y0
+            if object_y0 > miny and object_y0 < maxy:
+                objects.append(child_object)
+        return objects
 
-    ''' return all text objects where search string is found '''
-    def search(self,searchstring,pagenr=None):
-        children=[]
-        pagenumbers=[]
-        if pagenr:
-            pagenumbers = [pagenr]
-        else:
-            pagenumbers = range(1,1+self.nrpages)
-        for pagenr in pagenumbers:
-            pageobjects=self.__searchpage(self.getpagelayout(pagenr), searchstring)
-            children.append(pageobjects)
-        return children
+    ''' return all text objects where search string is found,
+        note: this is a flat list, even when searching over multiple pages
+    '''
+    def searchstr(self,searchstring):
+        searchresult=[]
+        for pl in self.pagelayouts:
+            pageobjects=self.__searchpagestr(pl, searchstring)
+            searchresult.extend(pageobjects)
+        return searchresult
 
+    ''' search all text objects within y0 in maxerr range from given yval '''
+    def searchy(self, yval, maxerr):
+        searchresult=[]
+        for pl in self.pagelayouts:
+            pageobjects=self.__searchpagey(pl, yval, maxerr)
+            searchresult.extend(pageobjects)
+        return searchresult
+
+
+def printsplittext(txtobject):
+    txtstr=txtobject.get_text()
+    txtlst=txtstr.split('\n')
+    print(txtlst)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse pdf files')
@@ -72,60 +95,40 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--info', action="store_true", help='Print info about the pdf/page. Default action if no other command given.')
     parser.add_argument('-p', '--page', type=int, help='Specify page number to operate on.')
     parser.add_argument('-s', '--search', type=str, help='Search text string in text objects')
+    parser.add_argument('-sy', '--searchy0', type=int, help='Search for given y0 page location in text objects')
     args = parser.parse_args()
 
     openedpdffile = open(args.filename,'rb')
-    mypdfparser = PdfParser(openedpdffile)
-
-    info = mypdfparser.getdocinfo()
-    nrpages = mypdfparser.nrofpages()
-
+    # instance mypdfparser will have limited scope if page is selected:
     if args.page:
-        pages=[args.page]
+        mypdfparser = PdfParser(openedpdffile, args.page)
     else:
-        pages=range(1,1+nrpages)
-        print(pages)
+        mypdfparser = PdfParser(openedpdffile)
 
-    if args.search:
-        searchstring=args.search
-
+    # print info if requested
     if args.info:
+        info = mypdfparser.getdocinfo()
+        print('PDF info:')
         for key in info.keys():
             print(key, ":", info[key])
+        nrpages = mypdfparser.nrofpages()
         print('Nr of pages:', nrpages)
 
-    for p in pages:
-        print('page',p)
+    # search for text if requested
+    if args.search:
+        searchstring=args.search
         print('search string',searchstring)
-        pl=mypdfparser.getpagelayout(p)
-        # searchresult = findChildWithString(pl, searchstring)
-        mypdfparser.search(searchstring)
-        searchresults=mypdfparser.search(searchstring,p)
-        for r in searchresults:
+        #mypdfparser.searchstr(searchstring)
+        searchresults=mypdfparser.searchstr(searchstring)
+        for txtobject in searchresults:
             print('Found',searchstring,'in following object:')
-            print(r)
+            printsplittext(txtobject)
+            print('Object y0 value:',txtobject.y0)
 
-
-    if False:
-        ''' note: value 0 is ignored this way; pages start at 1 '''
-        print('Detailed info for page',p)
-        pl=mypdfparser.getpagelayout(p)
-        cntr_lines=0
-        cntr_rect=0
-        cntr_fig=0
-        for child_object in pl:
-            ''' ignore lines '''
-            if isinstance(child_object,LTLine):
-                cntr_lines += 1
-            elif isinstance(child_object,LTRect):
-                cntr_rect += 1
-            elif isinstance(child_object,LTFigure):
-                cntr_fig += 1
-            else:
-                print(child_object)
-                print("note: skipped following:")
-                print("\tLTLine objects:", cntr_lines)
-                print("\tLTRect objects:", cntr_rect)
-                print("\tLTFigure objects:", cntr_fig)
-
+    if args.searchy0:
+        searchresults=mypdfparser.searchy(args.searchy0, 5)
+        for same_y_object in searchresults:
+            print('Found similar y in: ')
+            printsplittext(same_y_object)
+            print('Object y0 value:',same_y_object.y0)
 
