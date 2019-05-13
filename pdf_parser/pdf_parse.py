@@ -120,15 +120,16 @@ if __name__ == '__main__':
         print('search string',searchstring)
         #mypdfparser.searchstr(searchstring)
         searchresults=mypdfparser.searchstr(searchstring)
-        for txtobject in searchresults:
+        for o in searchresults:
             print('Found',searchstring,'in following object:')
-            printsplittext(txtobject)
-            print('Object y0 value:',txtobject.y0)
+            printsplittext(o)
+            print('Object coordinates (x0,y0,x1,y1): ', round(o.x0), round(o.y0), round(o.x1), round(o.y1))
 
     if args.searchy0:
         searchresults=mypdfparser.searchy(args.searchy0, 5)
-        for same_y_object in searchresults:
+        for o in searchresults:
             print('Found similar y in: ')
-            printsplittext(same_y_object)
-            print('Object y0 value:',same_y_object.y0)
+            printsplittext(o)
+            print('Object coordinates (x0,y0,x1,y1): ', round(o.x0), round(o.y0), round(o.x1), round(o.y1))
+
 
