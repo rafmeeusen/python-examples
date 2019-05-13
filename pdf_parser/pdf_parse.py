@@ -30,7 +30,7 @@ class PdfParser(object):
         pages = PDFPage.create_pages(self.doc)
         self.nrpages = 0
         self.pagelayouts = []
-        # count all pages, but only store requested pagelayout (or all if None)
+        # count all pages, but only store requested pagelayout (or all if pagenr==None)
         for p in pages:
             self.nrpages += 1
             # pagenr starts at 1, index in islice at 0
@@ -38,58 +38,55 @@ class PdfParser(object):
                 self.interpreter.process_page(p)
                 layout = self.device.get_result()
                 self.pagelayouts.append(layout)
+
     def nrofpages(self):
         return self.nrpages
+
     def getdocinfo(self):
         return self.doc.info[0]
-#    def getpagelayout(self, pagenr):
-#        return self.pagelayouts[pagenr-1]
 
-    ''' search all objects in pagelayout for given string '''
-    def __searchpagestr(self, pagelayout, searchstring):
-        objects=[]
-        for child_object in pagelayout:
-            if isinstance(child_object, LTTextBoxHorizontal) or isinstance(child_object, LTTextLineHorizontal):
-                object_text = child_object.get_text()
-            if searchstring in object_text:
-                objects.append(child_object)
-        return objects
-    def __searchpagey(self, pagelayout, yval, maxerr):
-        miny = yval-maxerr
-        maxy = yval+maxerr
-        objects=[]
-        for child_object in pagelayout:
-            if isinstance(child_object, LTTextBoxHorizontal) or isinstance(child_object, LTTextLineHorizontal):
-                object_y0 = child_object.y0
-            if object_y0 > miny and object_y0 < maxy:
-                objects.append(child_object)
-        return objects
+    ''' GENERATOR for all LTTextLineHorizontal objects in all pagelayouts '''
+    def txtlinegenerator(self):
+        pl = self.pagelayouts[0]
+        #for pl in self.pagelayouts:
+        for o in self.__txtlinegenerator_recursive(pl):
+            yield o
 
-    ''' return all text objects where search string is found,
-        note: this is a flat list, even when searching over multiple pages
-    '''
+    ''' actual recursive generator behind txtlinegenerator '''
+    def __txtlinegenerator_recursive(self, obj):
+        for o in obj:
+            if isinstance(o, LTTextLineHorizontal):
+                yield o
+            else:
+                try:
+                    iterator = iter(o)
+                except TypeError:
+                    # not iterable
+                    pass
+                else:
+                    yield from self.__txtlinegenerator_recursive(o)
+        return
+
+    ''' return all text objects where given search string is found '''
     def searchstr(self,searchstring):
         searchresult=[]
-        for pl in self.pagelayouts:
-            pageobjects=self.__searchpagestr(pl, searchstring)
-            searchresult.extend(pageobjects)
+        gen=self.txtlinegenerator()
+        for txtboxobject in gen:
+            if searchstring in txtboxobject.get_text():
+                searchresult.append(txtboxobject)
         return searchresult
 
     ''' search all text objects within y0 in maxerr range from given yval '''
     def searchy(self, yval, maxerr):
+        miny = yval-maxerr
+        maxy = yval+maxerr
         searchresult=[]
-        for pl in self.pagelayouts:
-            pageobjects=self.__searchpagey(pl, yval, maxerr)
-            searchresult.extend(pageobjects)
+        gen=self.txtlinegenerator()
+        for txtboxobject in gen:
+            object_y0 = txtboxobject.y0
+            if object_y0 > miny and object_y0 < maxy:
+                searchresult.append(txtboxobject)
         return searchresult
-
-
-def printsplittext(txtobject):
-    txtstr=txtobject.get_text().strip()
-    txtlst=txtstr.split('\n')
-    print(len(txtlst),'text lines in object:')
-    for l in txtlst:
-        print('\t',l)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse pdf files')
@@ -119,19 +116,18 @@ if __name__ == '__main__':
     # search for text if requested
     if args.search:
         searchstring=args.search
-        print('search string',searchstring)
-        #mypdfparser.searchstr(searchstring)
         searchresults=mypdfparser.searchstr(searchstring)
+        print('Found',searchstring,'in', len(searchresults), 'objects:')
         for o in searchresults:
-            print('Found',searchstring,'in following object:')
-            printsplittext(o)
-            print('Object coordinates (x0,y0,x1,y1): ', round(o.x0), round(o.y0), round(o.x1), round(o.y1))
+            print('\tFull object text:',o.get_text().strip())
+            print('\tObject coordinates (x0,y0,x1,y1): ', round(o.x0), round(o.y0), round(o.x1), round(o.y1))
 
     if args.searchy0:
-        searchresults=mypdfparser.searchy(args.searchy0, 5)
+        ydeviation=1
+        searchresults=mypdfparser.searchy(args.searchy0, ydeviation)
+        print('Found y-value',args.searchy0,'+-',ydeviation,'for following objects: ')
         for o in searchresults:
-            print('Found similar y in: ')
-            printsplittext(o)
-            print('Object coordinates (x0,y0,x1,y1): ', round(o.x0), round(o.y0), round(o.x1), round(o.y1))
+            print('\tFull object text:',o.get_text().strip())
+            print('\tObject coordinates (x0,y0,x1,y1): ', round(o.x0), round(o.y0), round(o.x1), round(o.y1))
 
 
