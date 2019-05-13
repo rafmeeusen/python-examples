@@ -85,9 +85,11 @@ class PdfParser(object):
 
 
 def printsplittext(txtobject):
-    txtstr=txtobject.get_text()
+    txtstr=txtobject.get_text().strip()
     txtlst=txtstr.split('\n')
-    print(txtlst)
+    print(len(txtlst),'text lines in object:')
+    for l in txtlst:
+        print('\t',l)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parse pdf files')
