@@ -47,10 +47,9 @@ class PdfParser(object):
 
     ''' GENERATOR for all LTTextLineHorizontal objects in all pagelayouts '''
     def txtlinegenerator(self):
-        pl = self.pagelayouts[0]
-        #for pl in self.pagelayouts:
-        for o in self.__txtlinegenerator_recursive(pl):
-            yield o
+        for pl in self.pagelayouts:
+            for o in self.__txtlinegenerator_recursive(pl):
+                yield o
 
     ''' actual recursive generator behind txtlinegenerator '''
     def __txtlinegenerator_recursive(self, obj):
@@ -129,5 +128,4 @@ if __name__ == '__main__':
         for o in searchresults:
             print('\tFull object text:',o.get_text().strip())
             print('\tObject coordinates (x0,y0,x1,y1): ', round(o.x0), round(o.y0), round(o.x1), round(o.y1))
-
 
