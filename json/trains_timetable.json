@@ -1,0 +1,90 @@
+[
+
+{
+  "train": "3264",
+  "line": "S9",
+  "stops": [
+        {"station": "Bordet",   "time": "15:41"},
+        {"station": "Diegem",   "time": "15:47"},
+        {"station": "Zaventem", "time": "15:50"},
+        {"station": "Leuven",   "time": "16:08"}
+    ]    
+}
+,{
+  "train": "3664",
+  "line": "S2",
+  "stops": [
+        
+        {"station": "Diegem",   "time": "15:53"},
+        {"station": "Zaventem", "time": "15:56"},
+        {"station": "Leuven",   "time": "16:20"}
+    ]    
+}
+,{
+  "train": "3765",
+  "line": "S2",
+  "stops": [        
+        {"station": "Diegem",   "time": "16:23"},
+        {"station": "Zaventem", "time": "16:26"},
+        {"station": "Leuven",   "time": "16:49"}        
+    ]    
+}
+,{
+  "train": "3265",
+  "line": "S9",
+  "stops": [        
+        {"station": "Bordet",   "time": "16:41"},
+        {"station": "Diegem",   "time": "16:47"},
+        {"station": "Zaventem", "time": "16:50"},
+        {"station": "Leuven",   "time": "17:08"}
+    ]    
+}
+,{
+  "train": "3665", 
+  "line": "S2",
+  "stops": [        
+        {"station": "Diegem",   "time": "16:54"},
+        {"station": "Zaventem", "time": "16:57"},
+        {"station": "Leuven",   "time": "17:20"}        
+    ]    
+}
+,{
+  "train": "3766",
+  "line": "S2",
+  "stops": [        
+        {"station": "Diegem",   "time": "17:23"},
+        {"station": "Zaventem", "time": "17:26"},
+        {"station": "Leuven",   "time": "17:49"}        
+    ]    
+}
+,{
+  "train": "3266",
+  "line": "S9",
+  "stops": [        
+        {"station": "Bordet",   "time": "17:41"},
+        {"station": "Diegem",   "time": "17:47"},
+        {"station": "Zaventem", "time": "17:50"},
+        {"station": "Leuven",   "time": "18:08"}        
+    ]    
+}
+,{
+  "train": "3666",
+  "line": "S2",
+  "stops": [        
+        {"station": "Diegem",   "time": "17:54"},
+        {"station": "Zaventem", "time": "17:57"},
+        {"station": "Leuven",   "time": "18:20"}        
+    ]    
+}
+,{
+  "train": "3767", 
+  "line": "S2",
+  "stops": [        
+        {"station": "Diegem",   "time": "18:23"},
+        {"station": "Zaventem", "time": "18:26"},
+        {"station": "Leuven",   "time": "18:49"}        
+    ]    
+}
+
+]
+
