@@ -1,6 +1,24 @@
 [
 
 {
+  "train": "3663",
+  "line": "S2",
+  "stops": [
+        {"station": "Diegem",   "time": "14:53"},
+        {"station": "Zaventem", "time": "14:56"},
+        {"station": "Leuven",   "time": "15:20"}
+    ]    
+}
+,{
+  "train": "3764",
+  "line": "S2",
+  "stops": [
+        {"station": "Diegem",   "time": "15:23"},
+        {"station": "Zaventem", "time": "15:26"},
+        {"station": "Leuven",   "time": "15:49"}
+    ]    
+}
+,{
   "train": "3264",
   "line": "S9",
   "stops": [

@@ -39,7 +39,7 @@ def print_connections(cons):
         if len(c)==2:
             print('from', c['origin'] ,'to', c['destination'])
         else:
-            print('KKE', c['work'], 'via', c['origin'] ,'to', c['destination'])
+            print('KKE', c['work']['time'], 'via', c['origin']['station'], '\tat', c['origin']['time'] ,'in', c['destination']['station'], 'at', c['destination']['time'])
 
 
 
@@ -78,12 +78,12 @@ def main(fn):
     print("Reading data from", fn)
     fp=open(fn)
     data=json.load(fp)
-    print('== connections')
     cons=data2connections(data)
-    print_connections(cons)
+    #print('== connections')
+    #print_connections(cons)
     cons2=addcycletimes(cons, cycletimes)
-    print('== connections 2')
-    print_connections(cons2)
+    print('== connections')
+    print_connections( sorted(cons2, key=lambda el: el['work']['time'])  )
 
 if __name__ == "__main__":
     fn = DEFAULT_FILE
