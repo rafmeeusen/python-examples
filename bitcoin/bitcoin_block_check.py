@@ -1,9 +1,6 @@
 # parsing a json blockchain block file coming from 
 # https://blockchain.info/rawblock/
-# or:
-# https://blockchain.info/block-height/
 # DOC: https://www.blockchain.com/explorer/api/blockchain_api
-
 # e.g. https://blockchain.info/rawblock/125552
 
 import json
@@ -26,16 +23,7 @@ except Exception as e:
     print(e)
     exit(77)
 
-
-
-# rawblocks vs block-height
-
-if 'blocks' in jblk.keys():
-    # guessing this is a blocks: hash - hash ... structure 
-    blk = jblk['blocks'][0]
-else:
-    blk = jblk
-
+blk = jblk
 
 prev_hash_xbe = blk['prev_block']
 mrkl_root_xbe = blk['mrkl_root']
